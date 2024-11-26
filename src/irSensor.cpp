@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <irSensor.h>
 
 bool printFlag = true;

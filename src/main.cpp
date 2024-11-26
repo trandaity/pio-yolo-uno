@@ -194,24 +194,22 @@ ERA_WRITE(V28)
   }
 }
 
-ERaString estr;
-ERaWidgetTerminalBox terminal(estr, V22, V23);
-
 /* This function print uptime every second */
 void timerEvent()
 {
   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
 }
 
+ERaString estr;
+ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
 
-
-void terminalCallBack() {
+void IrSensorTerminalCallBack() {
   if (estr == "Hi!") {
-    terminal.print("Hello! ");
+    IrSensorTerminal.print("Hello! ");
   }
 
-  terminal.print("Thank you for using ERa");
-  terminal.flush();
+  IrSensorTerminal.print("Thank you for using ERa");
+  IrSensorTerminal.flush();
 }
 
 void setup()
@@ -239,7 +237,7 @@ void setup()
   ERa.setScanWiFi(true);
 
   /* Initializing Terminal box Widget with callback function: terminalCallBack */
-  terminal.begin(terminalCallBack);
+  IrSensorTerminal.begin(IrSensorTerminalCallBack);
 
   /* Initializing the ERa library. */
   ERa.begin(ssid, pass);
