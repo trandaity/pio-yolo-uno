@@ -36,6 +36,7 @@
 #endif
 
 #include <Arduino.h>
+#include <freeRTOS/FreeRTOS.h>
 #include <ERa.hpp>
 #include <Widgets/ERaWidgets.hpp>
 
@@ -45,6 +46,12 @@
 #if defined(BUTTON_PIN)
   #include <pthread.h>
   #include <ERa/ERaButton.hpp>
+#endif
+
+#if CONFIG_FREERTOS_UNICORE
+  static const BaseType_t app_cpu = 0;
+#else
+  static const BaseType_t app_cpu = 1;
 #endif
 
 const char ssid[] = "Vector";
@@ -195,10 +202,10 @@ ERA_WRITE(V28)
 }
 
 /* This function print uptime every second */
-void timerEvent()
-{
-  ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
-}
+// void timerEvent()
+// {
+//   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
+// }
 
 ERaString estr;
 ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
@@ -226,6 +233,8 @@ void setup()
   ERa.setPersistent(true);
 #endif
 
+  vTaskDelay (2000 / portTICK_PERIOD_MS);
+
   /* Set board id */
   // ERa.setBoardID("Board_1");
 
@@ -243,26 +252,24 @@ void setup()
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
-  ERa.addInterval(1000L, timerEvent);
+  //ERa.addInterval(1000L, timerEvent);
 
   ERa.virtualWrite(V21, "Hello, ERa!");
 
   Serial.print("\n The stepper's current position: ");
   Serial.print(stepper1.currentPosition());
-  delay(5000);
+
+  vTaskDelay (2000 / portTICK_PERIOD_MS);
+
   stepper1.setMaxSpeed(1000.0);
   stepper1.setAcceleration(100.0);
   stepper1.setSpeed(200);
   stepper1.moveTo(endPoint);
 
   setupIrSensor();
-}
 
-void loop()
-{
-  ERa.run();
-  stepper1.run();
-  readFromIrSensor();
+  //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
+  xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
 
   // if (stepper1.distanceToGo() == 0)
   // {
@@ -272,4 +279,9 @@ void loop()
   //   stepper1.moveTo(endPoint);
   //   Serial.println(stepper1.currentPosition());
   // }
+}
+
+void loop()
+{
+  ERa.run();
 }

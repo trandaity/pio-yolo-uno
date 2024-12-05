@@ -5,4 +5,4 @@
 extern bool printFlag;
 
 void setupIrSensor();
-void readFromIrSensor();
+void readFromIrSensor(void* parameter);

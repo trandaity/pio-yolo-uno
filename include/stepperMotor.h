@@ -18,3 +18,4 @@ void rotateAntiClockwise();
 void setZeroPosition();
 void stepMultiplierIncrement();
 void stepMultiplierDecrement();
+void runStepper(void* parameter);
