@@ -266,10 +266,10 @@ void setup()
   stepper1.setSpeed(200);
   stepper1.moveTo(endPoint);
 
-  setupIrSensor();
+  //setupIrSensor();
 
-  //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
-  xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
+  xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
+  //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
 
   // if (stepper1.distanceToGo() == 0)
   // {
