@@ -3,7 +3,7 @@
 AccelStepper stepper1(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 
 int endPoint = 0;
-int stepMultiplier = 1;
+int stepMultiplier = 256;
 
 void rotateClockwise() {
 	endPoint += stepMultiplier;
