@@ -39,6 +39,6 @@ void stepMultiplierDecrement() {
 void runStepper(void* parameter) {
 	while (1) {
 		stepper1.run();
-		vTaskDelay(50 / portTICK_PERIOD_MS);
+		vTaskDelay(100 / portTICK_PERIOD_MS);
 	}
 }

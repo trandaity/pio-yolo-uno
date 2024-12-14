@@ -42,6 +42,7 @@
 
 #include <stepperMotor.h>
 #include <irSensor.h>
+#include <hBridgeDemo.h>
 
 #if defined(BUTTON_PIN)
   #include <pthread.h>
@@ -259,16 +260,25 @@ void setup()
   Serial.print("\n The stepper's current position: ");
   Serial.print(stepper1.currentPosition());
 
-  vTaskDelay (2000 / portTICK_PERIOD_MS);
-
   stepper1.setMaxSpeed(1000.0);
   stepper1.setAcceleration(100.0);
   stepper1.setSpeed(200);
   stepper1.moveTo(endPoint);
 
+  vTaskDelay (2000 / portTICK_PERIOD_MS);
+
+  while (!mtDriver.begin(&Wire, HBRIDGE_I2C_ADDR, 11, 12, 100000L)) {
+    Serial.println("\n HBridge Not Found!");
+    delay(1000);
+  }
+  fw_version = mtDriver.getFirmwareVersion();
+  Serial.printf("HBridge Firmware Version: %d\r\n", fw_version);
+
+
   //setupIrSensor();
 
   xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
+  xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
 
   // if (stepper1.distanceToGo() == 0)
