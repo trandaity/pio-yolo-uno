@@ -2,6 +2,7 @@
 
 M5UnitHbridge mtDriver;
 uint8_t fw_version = 0;
+int dr_speed = 0;
 
 void getCurrentVoltage() {
   if (fw_version >= 2) {
@@ -21,6 +22,10 @@ void ERa_HBridgeDriveBackward() {
 
 void ERa_HBridgeStop() {
   mtDriver.setDriverDirection(HBRIDGE_STOP);
+}
+
+void ERa_setSpeed8b() {
+  mtDriver.setDriverSpeed8Bits(dr_speed);
 }
 
 void hBridgeDriverRun(void* parameter) {

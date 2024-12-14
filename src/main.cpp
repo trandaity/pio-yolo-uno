@@ -202,6 +202,43 @@ ERA_WRITE(V28)
   }
 }
 
+ERA_WRITE(V30) {        // Set DC Motor Direction to Forward
+  int value = param.getInt();
+
+  if (value == 30) {
+    ERa_HBridgeDriveForward();
+
+    Serial.println("\n DC Motor Current Direction: Forward");
+  }
+}
+
+ERA_WRITE(V31) {        // Stop the DC Motor
+  int value = param.getInt();
+
+  if (value == 31) {
+    ERa_HBridgeStop();
+
+    Serial.println("\n DC Motor Has Stopped!");
+  }
+}
+
+ERA_WRITE(V32) {        // Set DC Motor Direction to Backward
+  int value = param.getInt();
+
+  if (value == 32) {
+    ERa_HBridgeDriveBackward();
+
+    Serial.println("\n DC Motor Current Direction: Backward");
+  }
+}
+
+ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
+  int value = param.getInt();
+  dr_speed = value;
+
+  ERa_setSpeed8b();
+}
+
 /* This function print uptime every second */
 // void timerEvent()
 // {
@@ -278,7 +315,7 @@ void setup()
   //setupIrSensor();
 
   xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
-  xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
+  //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
 
   // if (stepper1.distanceToGo() == 0)
