@@ -11,16 +11,16 @@ void getCurrentVoltage() {
   Serial.printf("%.2fV\r\n", mtDriver.getAnalogInput(_12bit) / 4095.0f * 3.3f / 0.09f);
 }
 
-void hBridgeDriveForward() {
-  
+void ERa_HBridgeDriveForward() {
+  mtDriver.setDriverDirection(HBRIDGE_FORWARD);
 }
 
-void hBridgeDriveBackward() {
-
+void ERa_HBridgeDriveBackward() {
+  mtDriver.setDriverDirection(HBRIDGE_BACKWARD);
 }
 
-void hBridgeStop() {
-
+void ERa_HBridgeStop() {
+  mtDriver.setDriverDirection(HBRIDGE_STOP);
 }
 
 void hBridgeDriverRun(void* parameter) {
