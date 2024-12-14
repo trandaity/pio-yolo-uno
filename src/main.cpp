@@ -237,6 +237,7 @@ ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
   dr_speed = value;
 
   ERa_setSpeed8b();
+  Serial.printf("\n DC Motor Speed (8-bits): %d", dr_speed);
 }
 
 /* This function print uptime every second */
@@ -309,12 +310,12 @@ void setup()
     delay(1000);
   }
   fw_version = mtDriver.getFirmwareVersion();
-  Serial.printf("HBridge Firmware Version: %d\r\n", fw_version);
+  Serial.printf("\n HBridge Firmware Version: %d\r\n", fw_version);
 
 
   //setupIrSensor();
 
-  xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
+  //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
 
