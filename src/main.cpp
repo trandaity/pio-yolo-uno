@@ -234,7 +234,7 @@ ERA_WRITE(V32) {        // Set DC Motor Direction to Backward
 
 ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
   int value = param.getInt();
-  dr_speed = value;
+  dr_speed = 2.55f * value;
 
   ERa_setSpeed8b();
   Serial.printf("\n DC Motor Speed (8-bits): %d", dr_speed);

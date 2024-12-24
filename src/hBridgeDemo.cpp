@@ -2,7 +2,7 @@
 
 M5UnitHbridge mtDriver;
 uint8_t fw_version = 0;
-int dr_speed = 0;
+uint8_t dr_speed = 0;
 
 void getCurrentVoltage() {
   if (fw_version >= 2) {
@@ -25,6 +25,10 @@ void ERa_HBridgeStop() {
 }
 
 void ERa_setSpeed8b() {
+  if (dr_speed > 255) {
+    dr_speed = 255;
+  }
+  
   mtDriver.setDriverSpeed8Bits(dr_speed);
 }
 
