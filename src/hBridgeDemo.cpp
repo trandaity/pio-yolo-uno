@@ -2,7 +2,7 @@
 
 M5UnitHbridge mtDriver;
 uint8_t fw_version = 0;
-uint8_t dr_speed = 0;
+int dr_speed = 0;
 
 void getCurrentVoltage() {
   if (fw_version >= 2) {

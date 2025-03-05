@@ -20,7 +20,7 @@
 // #define ERA_LOCATION_SG
 
 // You should get Auth Token in the ERa App or ERa Dashboard
-#define ERA_AUTH_TOKEN "5c166647-56cb-42c1-b903-d65c54190bc2"
+#define ERA_AUTH_TOKEN "a6788fa1-a93a-4a11-a608-4a80215db1c8"
 
 /* Define setting button */
 // #define BUTTON_PIN              0
@@ -55,8 +55,8 @@
   static const BaseType_t app_cpu = 1;
 #endif
 
-const char ssid[] = "Vector";
-const char pass[] = "avfi2025";
+const char ssid[] = "TyTran";
+const char pass[] = "vectortran151";
 
 WiFiClient mbTcpClient;
 
@@ -295,22 +295,22 @@ void setup()
 
   ERa.virtualWrite(V21, "Hello, ERa!");
 
-  Serial.print("\n The stepper's current position: ");
-  Serial.print(stepper1.currentPosition());
+  // Serial.print("\n The stepper's current position: ");
+  // Serial.print(stepper1.currentPosition());
 
-  stepper1.setMaxSpeed(1000.0);
-  stepper1.setAcceleration(100.0);
-  stepper1.setSpeed(200);
-  stepper1.moveTo(endPoint);
+  // stepper1.setMaxSpeed(1000.0);
+  // stepper1.setAcceleration(100.0);
+  // stepper1.setSpeed(200);
+  // stepper1.moveTo(endPoint);
 
-  vTaskDelay (2000 / portTICK_PERIOD_MS);
+  //vTaskDelay (2000 / portTICK_PERIOD_MS);
 
-  while (!mtDriver.begin(&Wire, HBRIDGE_I2C_ADDR, 11, 12, 100000L)) {
-    Serial.println("\n HBridge Not Found!");
-    delay(1000);
-  }
-  fw_version = mtDriver.getFirmwareVersion();
-  Serial.printf("\n HBridge Firmware Version: %d\r\n", fw_version);
+  // while (!mtDriver.begin(&Wire, HBRIDGE_I2C_ADDR, 11, 12, 100000L)) {
+  //   Serial.println("\n HBridge Not Found!");
+  //   delay(1000);
+  // }
+  // fw_version = mtDriver.getFirmwareVersion();
+  // Serial.printf("\n HBridge Firmware Version: %d\r\n", fw_version);
 
 
   //setupIrSensor();
