@@ -10,7 +10,9 @@
         "unordered_set": "cpp",
         "vector": "cpp",
         "string_view": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "*.tpp": "cpp",
+        "cmath": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
