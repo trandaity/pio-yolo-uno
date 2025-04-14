@@ -43,6 +43,8 @@
 #include <stepperMotor.h>
 #include <irSensor.h>
 #include <hBridgeDemo.h>
+#include <dht20_tasks.h>
+#include <rgb_light.h>
 
 #if defined(BUTTON_PIN)
   #include <pthread.h>
@@ -50,15 +52,20 @@
 #endif
 
 #if CONFIG_FREERTOS_UNICORE
-  static const BaseType_t app_cpu = 0;
+  static const BaseType_t running_core = 0;
 #else
-  static const BaseType_t app_cpu = 1;
+  static const BaseType_t running_core = 1;
 #endif
 
 const char ssid[] = "TyTran";
 const char pass[] = "vectortran151";
 
 WiFiClient mbTcpClient;
+
+static ERaFlash flash;
+static WiFiClient ERaWiFiClient;
+static ERaMqtt<WiFiClient, MQTTClient> mqtt(ERaWiFiClient);
+ERaPnP< ERaMqtt<WiFiClient, MQTTClient> > ERa(mqtt, flash);
 
 #if defined(BUTTON_PIN)
 ERaButton button;
@@ -241,13 +248,16 @@ ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
 }
 
 /* This function print uptime every second */
-// void timerEvent()
-// {
-//   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
-// }
+void timerEvent()
+{
+  //ERa_DHTReadEvent();
+  ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
+}
 
 ERaString estr;
 ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
+
+byte busStatus;
 
 void IrSensorTerminalCallBack() {
   if (estr == "Hi!") {
@@ -272,8 +282,6 @@ void setup()
   ERa.setPersistent(true);
 #endif
 
-  vTaskDelay (2000 / portTICK_PERIOD_MS);
-
   /* Set board id */
   // ERa.setBoardID("Board_1");
 
@@ -291,9 +299,43 @@ void setup()
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
-  //ERa.addInterval(1000L, timerEvent);
+  ERa.addInterval(1000L, timerEvent);
+  ERa.addInterval(2000L, ERa_DHTReadEvent);
 
-  ERa.virtualWrite(V21, "Hello, ERa!");
+  //ERa.virtualWrite(V21, "Hello, ERa!");
+
+  DHT20_init();
+  rgb_1.begin();
+
+  // I2C Devices Scanner
+  for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
+  {
+    Wire.beginTransmission(i2cAddress);
+    busStatus = Wire.endTransmission();
+    if (busStatus == 0x00)
+    {
+      Serial.print("I2C Device found at address: 0x");
+      Serial.println(i2cAddress, HEX);
+    }
+    else
+    {
+      Serial.print("I2C Device not found at address: 0x");
+      Serial.println(i2cAddress, HEX);
+    }
+  }
+
+  /* 
+  RTOS Tasks initialization section
+  */
+  
+  //xTaskCreate(DHT20_run, "Task DHT20 Temperature Humidity", 2048, NULL, 2, NULL);
+  xTaskCreate(powerMonitor, "Power Monitoring", 2048, NULL, 2, NULL);
+
+  /* This printf is for debugging, 
+    to see if the program is reset from the beginning
+    when running RTOS tasks. If this line is printed, it means
+    there is something wrong when we initialize RTOS tasks 
+  */
 
   // Serial.print("\n The stepper's current position: ");
   // Serial.print(stepper1.currentPosition());
