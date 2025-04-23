@@ -20,7 +20,7 @@
 // #define ERA_LOCATION_SG
 
 // You should get Auth Token in the ERa App or ERa Dashboard
-#define ERA_AUTH_TOKEN "5c166647-56cb-42c1-b903-d65c54190bc2"
+#define ERA_AUTH_TOKEN "756df301-d9d8-458a-a268-bc216db45ee1"
 
 /* Define setting button */
 // #define BUTTON_PIN              0
@@ -55,10 +55,15 @@
   static const BaseType_t app_cpu = 1;
 #endif
 
-const char ssid[] = "Vector";
-const char pass[] = "avfi2025";
+const char ssid[] = "TyTran";
+const char pass[] = "vectortran151";
 
 WiFiClient mbTcpClient;
+
+static ERaFlash flash;
+static WiFiClient ERaWiFiClient;
+static ERaMqtt<WiFiClient, MQTTClient> mqtt(ERaWiFiClient);
+ERaPnP< ERaMqtt<WiFiClient, MQTTClient> > ERa(mqtt, flash);
 
 #if defined(BUTTON_PIN)
 ERaButton button;
