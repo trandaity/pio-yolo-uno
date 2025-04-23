@@ -139,111 +139,43 @@ ERA_WRITE(V21) // Text box Widget
   }
 }
 
-ERA_WRITE(V24) // Rotate Camera anti-Clockwise
-{
-  int value = param.getInt();
+// ERA_WRITE(V30) {        // Set DC Motor Direction to Forward
+//   int value = param.getInt();
 
-  if (value == 24) {
-    rotateAntiClockwise();
+//   if (value == 30) {
+//     ERa_HBridgeDriveForward();
 
-    Serial.print("\n The stepper's current position: ");
-    Serial.print(stepper1.currentPosition());
-    Serial.print("\n");
-  }
-}
+//     Serial.println("\n DC Motor Current Direction: Forward");
+//   }
+// }
 
-ERA_WRITE(V25) // Rotate Camera Clockwise
-{
-  int value = param.getInt();
+// ERA_WRITE(V31) {        // Stop the DC Motor
+//   int value = param.getInt();
 
-  if (value == 25) {
-    rotateClockwise();
+//   if (value == 31) {
+//     ERa_HBridgeStop();
 
-    Serial.print("\n The stepper's current position: ");
-    Serial.print(stepper1.currentPosition());
-    Serial.print("\n");
-  }
-}
+//     Serial.println("\n DC Motor Has Stopped!");
+//   }
+// }
 
-ERA_WRITE(V26) // Set the initial zero position of the camera
-{
-  int value = param.getInt();
+// ERA_WRITE(V32) {        // Set DC Motor Direction to Backward
+//   int value = param.getInt();
 
-  if (value == 26) {
-    setZeroPosition();
+//   if (value == 32) {
+//     ERa_HBridgeDriveBackward();
 
-    Serial.print("\n The initial zero position have been set!");
-    Serial.print("\n The stepper's current position: ");
-    Serial.print(stepper1.currentPosition());
-    Serial.print("\n");
-  }
-}
+//     Serial.println("\n DC Motor Current Direction: Backward");
+//   }
+// }
 
-ERA_WRITE(V27)
-{
-  int value = param.getInt();
+// ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
+//   int value = param.getInt();
+//   dr_speed = 2.55f * value;
 
-  if (value == 27) {
-    stepMultiplierIncrement();
-
-    Serial.print("\n The step multiplier has been incremented");
-    Serial.print("\n Current step multiplier: ");
-    Serial.print(stepMultiplier);
-    Serial.print("\n");
-  }
-}
-
-ERA_WRITE(V28)
-{
-  int value = param.getInt();
-
-  if (value == 28) {
-    stepMultiplierDecrement();
-
-    Serial.print("\n The step multiplier has been decremented");
-    Serial.print("\n Current step multiplier: ");
-    Serial.print(stepMultiplier);
-    Serial.print("\n");
-  }
-}
-
-ERA_WRITE(V30) {        // Set DC Motor Direction to Forward
-  int value = param.getInt();
-
-  if (value == 30) {
-    ERa_HBridgeDriveForward();
-
-    Serial.println("\n DC Motor Current Direction: Forward");
-  }
-}
-
-ERA_WRITE(V31) {        // Stop the DC Motor
-  int value = param.getInt();
-
-  if (value == 31) {
-    ERa_HBridgeStop();
-
-    Serial.println("\n DC Motor Has Stopped!");
-  }
-}
-
-ERA_WRITE(V32) {        // Set DC Motor Direction to Backward
-  int value = param.getInt();
-
-  if (value == 32) {
-    ERa_HBridgeDriveBackward();
-
-    Serial.println("\n DC Motor Current Direction: Backward");
-  }
-}
-
-ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
-  int value = param.getInt();
-  dr_speed = 2.55f * value;
-
-  ERa_setSpeed8b();
-  Serial.printf("\n DC Motor Speed (8-bits): %d", dr_speed);
-}
+//   ERa_setSpeed8b();
+//   Serial.printf("\n DC Motor Speed (8-bits): %d", dr_speed);
+// }
 
 /* This function print uptime every second */
 // void timerEvent()
@@ -277,8 +209,6 @@ void setup()
   ERa.setPersistent(true);
 #endif
 
-  vTaskDelay (2000 / portTICK_PERIOD_MS);
-
   /* Set board id */
   // ERa.setBoardID("Board_1");
 
@@ -298,40 +228,11 @@ void setup()
   /* Setup timer called function every second */
   //ERa.addInterval(1000L, timerEvent);
 
-  ERa.virtualWrite(V21, "Hello, ERa!");
-
-  Serial.print("\n The stepper's current position: ");
-  Serial.print(stepper1.currentPosition());
-
-  stepper1.setMaxSpeed(1000.0);
-  stepper1.setAcceleration(100.0);
-  stepper1.setSpeed(200);
-  stepper1.moveTo(endPoint);
-
-  vTaskDelay (2000 / portTICK_PERIOD_MS);
-
-  while (!mtDriver.begin(&Wire, HBRIDGE_I2C_ADDR, 11, 12, 100000L)) {
-    Serial.println("\n HBridge Not Found!");
-    delay(1000);
-  }
-  fw_version = mtDriver.getFirmwareVersion();
-  Serial.printf("\n HBridge Firmware Version: %d\r\n", fw_version);
-
-
-  //setupIrSensor();
+  //ERa.virtualWrite(V21, "Hello, ERa!");
 
   //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
-
-  // if (stepper1.distanceToGo() == 0)
-  // {
-  //   Serial.println(stepper1.currentPosition());
-  //   stepper1.setCurrentPosition(0);
-  //   endPoint = -endPoint;
-  //   stepper1.moveTo(endPoint);
-  //   Serial.println(stepper1.currentPosition());
-  // }
 }
 
 void loop()
