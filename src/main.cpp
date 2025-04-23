@@ -20,10 +20,16 @@
 // #define ERA_LOCATION_SG
 
 // You should get Auth Token in the ERa App or ERa Dashboard
-#define ERA_AUTH_TOKEN "a6788fa1-a93a-4a11-a608-4a80215db1c8"
+#define ERA_AUTH_TOKEN "500a2857-19ae-47ee-b2da-b5bc4830dd6b"
 
 /* Define setting button */
 // #define BUTTON_PIN              0
+
+/* User-defined preprocessor */
+#define SDA_0 11
+#define SCL_0 12
+#define SDA_1 17
+#define SCL_1 18
 
 #if defined(BUTTON_PIN)
 // Active low (false), Active high (true)
@@ -43,8 +49,8 @@
 #include <stepperMotor.h>
 #include <irSensor.h>
 #include <hBridgeDemo.h>
-#include <dht20_tasks.h>
 #include <rgb_light.h>
+#include <socket_ctrl.h>
 
 #if defined(BUTTON_PIN)
   #include <pthread.h>
@@ -259,6 +265,10 @@ ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
 
 byte busStatus;
 
+/*-------------- Initialize I2C hardware instances ---------------*/ 
+TwoWire I2C_0 = TwoWire(0);
+TwoWire I2C_1 = TwoWire(1);
+
 void IrSensorTerminalCallBack() {
   if (estr == "Hi!") {
     IrSensorTerminal.print("Hello! ");
@@ -299,19 +309,24 @@ void setup()
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
-  ERa.addInterval(1000L, timerEvent);
-  ERa.addInterval(2000L, ERa_DHTReadEvent);
+  //ERa.addInterval(1000L, timerEvent);
 
-  //ERa.virtualWrite(V21, "Hello, ERa!");
+  /*-------------- Begin I2C interface ---------------*/
+  I2C_0.begin(SDA_0, SCL_0, 100000U);
+  I2C_1.begin(SDA_1, SCL_1, 100000U);
 
-  DHT20_init();
-  rgb_1.begin();
+  /*-------------- Initialize Peripherals ---------------*/ 
+  // DHT20_init();
+  // rgb_1.begin();
+  relay_0.begin(&I2C_0, SDA_0, SCL_0);
+  relay_0.Init(1);
+  sensor_0.begin(&I2C_0, UNIT_ACMEASURE_ADDR, SDA_0, SCL_0);
 
-  // I2C Devices Scanner
+  /*-------------- I2C Devices Scanner ---------------*/ 
   for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
   {
-    Wire.beginTransmission(i2cAddress);
-    busStatus = Wire.endTransmission();
+    I2C_0.beginTransmission(i2cAddress);
+    busStatus = I2C_0.endTransmission();
     if (busStatus == 0x00)
     {
       Serial.print("I2C Device found at address: 0x");
@@ -324,12 +339,20 @@ void setup()
     }
   }
 
+  /*-------------- Miscellaneous Tasks ---------------*/
+  Serial.println("Voltage (V),\tCurrent (A),\tPower (W),\tEnergy (KWH)");
+
+
+  /*-------------- Setup Timer Events ---------------*/
+  //ERa.addInterval(2000L, ERa_DHTReadEvent);
+  ERa.addInterval(2000L, ERa_ACReadEvent);
+
   /* 
   RTOS Tasks initialization section
   */
   
   //xTaskCreate(DHT20_run, "Task DHT20 Temperature Humidity", 2048, NULL, 2, NULL);
-  xTaskCreate(powerMonitor, "Power Monitoring", 2048, NULL, 2, NULL);
+  //xTaskCreate(powerMonitor, "Power Monitoring", 2048, NULL, 2, NULL);
 
   /* This printf is for debugging, 
     to see if the program is reset from the beginning
