@@ -2,7 +2,7 @@
 
 extern M5UnitHbridge mtDriver;
 extern uint8_t fw_version;
-extern int dr_speed;
+extern uint8_t dr_speed;
 
 void getCurrentVoltage();
 void hBridgeDriverRun(void* parameter);
