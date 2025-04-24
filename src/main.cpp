@@ -40,12 +40,10 @@
 #include <ERa.hpp>
 #include <Widgets/ERaWidgets.hpp>
 
-#include <stepperMotor.h>
-#include <irSensor.h>
-#include <hBridgeDemo.h>
+#include <ERa_ENV.h>
 
-#define SDA 11;
-#define SCL 12;
+#define SDA 11
+#define SCL 12
 
 #if defined(BUTTON_PIN)
   #include <pthread.h>
@@ -187,13 +185,13 @@ ERA_WRITE(V21) // Text box Widget
 // }
 
 /*-------------- Initialize I2C hardware instances ---------------*/ 
-byte busStatus;
 TwoWire I2C_0 = TwoWire(0);
 
 /*-------------- Begin I2C interface ---------------*/
 I2C_0.begin(SDA, SCL, 100000U);
 
 /*-------------- Initialize Peripherals ---------------*/
+m5Env_init(I2C_0);
 
 /*-------------- I2C Devices Scanner ---------------*/ 
 for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
