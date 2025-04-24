@@ -140,75 +140,16 @@ ERA_WRITE(V21) // Text box Widget
   }
 }
 
-// ERA_WRITE(V30) {        // Set DC Motor Direction to Forward
-//   int value = param.getInt();
-
-//   if (value == 30) {
-//     ERa_HBridgeDriveForward();
-
-//     Serial.println("\n DC Motor Current Direction: Forward");
-//   }
-// }
-
-// ERA_WRITE(V31) {        // Stop the DC Motor
-//   int value = param.getInt();
-
-//   if (value == 31) {
-//     ERa_HBridgeStop();
-
-//     Serial.println("\n DC Motor Has Stopped!");
-//   }
-// }
-
-// ERA_WRITE(V32) {        // Set DC Motor Direction to Backward
-//   int value = param.getInt();
-
-//   if (value == 32) {
-//     ERa_HBridgeDriveBackward();
-
-//     Serial.println("\n DC Motor Current Direction: Backward");
-//   }
-// }
-
-// ERA_WRITE(V33) {        // Set DC Motor Speed (for 8-bits speed value)
-//   int value = param.getInt();
-//   dr_speed = 2.55f * value;
-
-//   ERa_setSpeed8b();
-//   Serial.printf("\n DC Motor Speed (8-bits): %d", dr_speed);
-// }
-
 /* This function print uptime every second */
 // void timerEvent()
 // {
 //   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
 // }
 
+byte busStatus;
 /*-------------- Initialize I2C hardware instances ---------------*/ 
 TwoWire I2C_0 = TwoWire(0);
-
-/*-------------- Begin I2C interface ---------------*/
-I2C_0.begin(SDA, SCL, 100000U);
-
-/*-------------- Initialize Peripherals ---------------*/
-m5Env_init(I2C_0);
-
-/*-------------- I2C Devices Scanner ---------------*/ 
-for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
-{
-  I2C_0.beginTransmission(i2cAddress);
-  busStatus = I2C_0.endTransmission();
-  if (busStatus == 0x00)
-  {
-    Serial.print("I2C Device found at address: 0x");
-    Serial.println(i2cAddress, HEX);
-  }
-  else
-  {
-    Serial.print("I2C Device not found at address: 0x");
-    Serial.println(i2cAddress, HEX);
-  }
-}
+TwoWire I2C_1 = TwoWire(1);
 
 ERaString estr;
 ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
@@ -252,10 +193,32 @@ void setup()
   /* Initializing the ERa library. */
   ERa.begin(ssid, pass);
 
-  /* Setup timer called function every second */
-  //ERa.addInterval(1000L, timerEvent);
+  /*-------------- Begin I2C interface ---------------*/
+  I2C_0.begin(SDA, SCL, 100000U);
 
-  
+  /*-------------- Initialize Peripherals ---------------*/
+  m5Env_init(I2C_0);
+
+  /*-------------- I2C Devices Scanner ---------------*/ 
+  for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
+  {
+    I2C_0.beginTransmission(i2cAddress);
+    busStatus = I2C_0.endTransmission();
+    if (busStatus == 0x00)
+    {
+      Serial.print("I2C Device found at address: 0x");
+      Serial.println(i2cAddress, HEX);
+    }
+    else
+    {
+      Serial.print("I2C Device not found at address: 0x");
+      Serial.println(i2cAddress, HEX);
+    }
+  }
+
+  /* Setup timer called function every second */
+  ERa.addInterval(3000L, ERa_ENVReadEvent);
+  //ERa.addInterval(1000L, timerEvent);
 
   //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);

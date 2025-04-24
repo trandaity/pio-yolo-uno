@@ -41,5 +41,6 @@ void ERa_ENVReadEvent() {
       Serial.print(F("Pressure: "));
       Serial.print(bmp.pressure);
       Serial.println(" Pa");
+      Serial.println("-------------\r\n");
   }
 }
