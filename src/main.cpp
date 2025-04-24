@@ -44,6 +44,9 @@
 #include <irSensor.h>
 #include <hBridgeDemo.h>
 
+#define SDA 11;
+#define SCL 12;
+
 #if defined(BUTTON_PIN)
   #include <pthread.h>
   #include <ERa/ERaButton.hpp>
@@ -183,6 +186,32 @@ ERA_WRITE(V21) // Text box Widget
 //   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
 // }
 
+/*-------------- Initialize I2C hardware instances ---------------*/ 
+byte busStatus;
+TwoWire I2C_0 = TwoWire(0);
+
+/*-------------- Begin I2C interface ---------------*/
+I2C_0.begin(SDA, SCL, 100000U);
+
+/*-------------- Initialize Peripherals ---------------*/
+
+/*-------------- I2C Devices Scanner ---------------*/ 
+for (int i2cAddress = 0x00; i2cAddress < 0x80; i2cAddress++)
+{
+  I2C_0.beginTransmission(i2cAddress);
+  busStatus = I2C_0.endTransmission();
+  if (busStatus == 0x00)
+  {
+    Serial.print("I2C Device found at address: 0x");
+    Serial.println(i2cAddress, HEX);
+  }
+  else
+  {
+    Serial.print("I2C Device not found at address: 0x");
+    Serial.println(i2cAddress, HEX);
+  }
+}
+
 ERaString estr;
 ERaWidgetTerminalBox IrSensorTerminal(estr, V22, V23);
 
@@ -228,7 +257,7 @@ void setup()
   /* Setup timer called function every second */
   //ERa.addInterval(1000L, timerEvent);
 
-  //ERa.virtualWrite(V21, "Hello, ERa!");
+  
 
   //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
   //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
