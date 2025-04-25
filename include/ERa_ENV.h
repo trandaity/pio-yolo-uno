@@ -8,7 +8,9 @@
 extern SHT4X sht;
 extern BMP280 bmp;
 
-extern float dewPoint;
+extern double trunc_temp;
+extern double trunc_humi;
+extern double dewPoint;
 
 void m5Env_init(TwoWire &wire);
 void ERa_ENVReadEvent();
