@@ -41,6 +41,7 @@
 #include <Widgets/ERaWidgets.hpp>
 
 #include <ERa_ENV.h>
+#include <ERa_anemometer.h>
 
 #define SDA 11
 #define SCL 12
@@ -193,6 +194,12 @@ void setup()
   /* Initializing the ERa library. */
   ERa.begin(ssid, pass);
 
+  pinMode(pinInterrupt, INPUT_PULLUP);
+  pinMode(48, OUTPUT);
+
+  // Enable Interrupt
+  attachInterrupt(digitalPinToInterrupt(pinInterrupt), onChange, FALLING);
+
   /*-------------- Begin I2C interface ---------------*/
   I2C_0.begin(SDA, SCL, 100000U);
 
@@ -217,15 +224,33 @@ void setup()
   }
 
   /* Setup timer called function every second */
-  ERa.addInterval(3000L, ERa_ENVReadEvent);
+  ERa.addInterval(1000L, ERa_ENVReadEvent);
   //ERa.addInterval(1000L, timerEvent);
 
-  //xTaskCreatePinnedToCore(runStepper, "Run Stepper Motor", 4096, NULL, 1, NULL, app_cpu);
-  //xTaskCreatePinnedToCore(hBridgeDriverRun, "Run H-Bridge DC Motor Driver", 4096, NULL, 1, NULL, app_cpu);
-  //xTaskCreatePinnedToCore(readFromIrSensor, "Read IR Obstacle Avoidance Sensor", 4096, NULL, 1, NULL, app_cpu);
+  // xTaskCreatePinnedToCore(anemoSetup, "Setup Anemometer and Enable Interrupt", 4096, NULL, 1, NULL, app_cpu);
+  // xTaskCreatePinnedToCore(printWindSpeedAndResetCount, "Print Wind Speed and Reset Count", 4096, NULL, 1, NULL, app_cpu);
+
+  //vTaskDelete(NULL);
 }
 
 void loop()
 {
+  if ((millis() - lastDebounceTime) > debounceDelay)
+  {
+    lastDebounceTime = millis();
+    wind_speed = (anemo_count * 8.75) / 100;
+
+    Serial.print("Wind Speed: ");
+    Serial.print(wind_speed);
+    Serial.println(" m/s");
+    Serial.println(anemo_count);
+
+    anemo_count = 0;
+
+    if (digitalRead(pinInterrupt) == LOW) {
+      digitalWrite(48, HIGH);
+    } else digitalWrite(48, LOW);
+  }
+
   ERa.run();
 }
